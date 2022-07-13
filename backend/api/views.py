@@ -62,7 +62,7 @@ class signUp(views.APIView):
                 password=data.get('username',None)
                 confirm_password=data.get('username',None)
                 if password!=confirm_password:
-                    return  Response({"error":"password not match"},status=status.HTTP_400_BAD_REQUEST)
+                    return  Response({"mess":"password not match"},status=status.HTTP_400_BAD_REQUEST)
 
                 else:
                     user = CustomUser.objects.create_user(username=username,email=email,password=password,mobileNo=mobileNo)
@@ -74,7 +74,7 @@ class signUp(views.APIView):
                     send_mail( subject, message, email_from, recipient_list )
                     return Response({"msg":"user is created"})
             else:
-                return Response({"error":"mobile no is not valid"})
+                return Response({"mess":"mobile no is not valid"})
         except exception as e:
             return Response({"msg":e})
 
@@ -94,7 +94,7 @@ class SendOtp(views.APIView):
             recipient_list = [email]
             send_mail( subject, message, email_from, recipient_list )
 
-            return Response({"message":"opt send successfully"})
+            return Response({"mess":"opt send successfully"})
 
         except exception as e:
              return Response({"msg":e})
@@ -130,10 +130,10 @@ class LoginView(views.APIView):
                     waitingTime=user_name.lastFailedLoginTime=currentTime.replace(tzinfo=utc)
                     user_name.save()
                     print(user_name.lastFailedLoginTime)
-                    return Response({"eorror":"you made more than 3 attemp and you have to wait 5 min"})
+                    return Response({"mess":"you made more than 3 attemp and you have to wait 5 min"})
 
 
-                return Response({"error":"Otp is not vailid"})
+                return Response({"mess":"Otp is not vailid"})
 
 
             else:
@@ -152,9 +152,9 @@ class LoginView(views.APIView):
                         return JsonResponse(res)            
                     else:
                         messages.warning(request, 'invalid credentials')
-                        return Response ({'error': False},status=status.HTTP_400_BAD_REQUEST)
+                        return Response ({'mess': False},status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    return Response({"message":"wait for 5 min"})
+                    return Response({"mess":"wait for 5 min"})
     
                 
 
