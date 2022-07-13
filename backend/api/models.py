@@ -11,5 +11,4 @@ class CustomUser(AbstractUser):
     otp=models.BigIntegerField(blank=True,null=True)
     failedLoginCount=models.IntegerField(blank=True,null=True,default=0)
     lastFailedLoginTime=models.DateTimeField(blank=True,null=True)
-    unlockTime=models.DateTimeField(blank=True,null=True)
     objects = UserManager()

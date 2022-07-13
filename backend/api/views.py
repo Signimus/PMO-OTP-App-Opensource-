@@ -17,6 +17,7 @@ from django.contrib.auth import logout
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+utc=pytz.UTC
 
 # Create your views here.
 
@@ -25,14 +26,10 @@ def home(request):
 
 
 def generateOTP() :
- 
-    # Declare a digits variable 
-    # which stores all digits
+
     digits = "0123456789"
     OTP = ""
  
-   # length of password can be changed
-   # by changing value in range
     for i in range(4) :
         OTP += digits[math.floor(random.random() * 10)]
  
@@ -82,7 +79,6 @@ class signUp(views.APIView):
             return Response({"msg":e})
 
 
-
 class SendOtp(views.APIView):
     def post(self,request):
         try:
@@ -113,30 +109,13 @@ class LoginView(views.APIView):
             user_name=CustomUser.objects.get(username=username)            
             dataBaseOtp=user_name.otp
             count=user_name.failedLoginCount
-            waitingTime=user_name.lastFailedLoginTime
-            currentTime=datetime.utcnow()
-            # currentTime.replace(tzinfo=utc)
-            # waitingTime.replace(tzinfo=utc)
+            currentTime=datetime.now()
+            currentTime = currentTime.replace(tzinfo=utc)
+            # waitingTime = waitingTime.replace(tzinfo=utc)
 
-            if(int(Opt)==dataBaseOtp):
-                print(waitingTime,"these is waiting time")
-                print(currentTime,"these is current")
-                # if(waitingTime<=currentTime):
-                Username=user_name.username
-                password=Username
-                count=user_name.failedLoginCount=0
-                user_name.save()
-                user = auth.authenticate(username=Username, password=password)
-                if user is not None:
-                    auth.login(request, user)
-                    res={"mes":"you are authorized"}
-                    return JsonResponse(res)            
-                else:
-                    messages.warning(request, 'invalid credentials')
-                    return Response ({'error': False},status=status.HTTP_400_BAD_REQUEST)
-                # else:
-                #     return Response({"message":"wait for 5 min"})
-            else:
+
+            
+            if (int(Opt) !=dataBaseOtp):
                 if(count==0):
                     faildCount=user_name.failedLoginCount=1
                     user_name.save()
@@ -147,12 +126,37 @@ class LoginView(views.APIView):
                     faildCount=user_name.failedLoginCount=3
                     user_name.save()
                 if(count==3):
-                    waitingTime=user_name.lastFailedLoginTime=datetime.utcnow() + timedelta(minutes=2)
-
+                    currentTime=datetime.now() + timedelta(minutes=5)
+                    waitingTime=user_name.lastFailedLoginTime=currentTime.replace(tzinfo=utc)
                     user_name.save()
+                    print(user_name.lastFailedLoginTime)
                     return Response({"eorror":"you made more than 3 attemp and you have to wait 5 min"})
-    
+
+
                 return Response({"error":"Otp is not vailid"})
+
+
+            else:
+                dataBaseTime=user_name.lastFailedLoginTime
+                print(currentTime,"these is current")
+                print(dataBaseTime,"these is dataBaseTime")
+                if(dataBaseTime<=currentTime):
+                    Username=user_name.username
+                    password=Username
+                    count=user_name.failedLoginCount=0
+                    user_name.save()
+                    user = auth.authenticate(username=Username, password=password)
+                    if user is not None:
+                        auth.login(request, user)
+                        res={"mes":"you are authorized"}
+                        return JsonResponse(res)            
+                    else:
+                        messages.warning(request, 'invalid credentials')
+                        return Response ({'error': False},status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    return Response({"message":"wait for 5 min"})
+    
+                
 
         except exception as e:
             return Response({"msg":e})
