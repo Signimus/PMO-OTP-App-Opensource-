@@ -28,7 +28,7 @@ const {alert,isOtp,setisOtp ,email,setemail,showAlert,password,setpassword,usern
                   }
                     showAlert(
                       true,
-                      `${res.data.message}`,
+                      `${res.data.mess}`,
                       'success'
                     )
                        

@@ -24,7 +24,7 @@ const Otp = () => {
                   
                     showAlert(
                       true,
-                      `${res.data.mes}`,
+                      `${res.data.mess}`,
                       'success'
                     )
                        
